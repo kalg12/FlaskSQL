@@ -4,6 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CRUD de Kevin</title>
+    <script>
+      function showEditForm(id, nombre, apellidos, telefono) {
+        document.getElementById("edit-id").value = id;
+        document.getElementById("edit-nombre").value = nombre;
+        document.getElementById("edit-apellidos").value = apellidos;
+        document.getElementById("edit-telefono").value = telefono;
+        document.getElementById("edit-form").style.display = "block";
+      }
+    </script>
   </head>
   <body>
     <h1>Lista de Usuarios</h1>
@@ -27,8 +36,58 @@
         >
           <button type="submit">Eliminar</button>
         </form>
+        <button
+          type="button"
+          onclick="showEditForm('{{ kevin.id }}', '{{ kevin.nombre }}', '{{ kevin.apellidos }}', '{{ kevin.telefono }}')"
+        >
+          Editar
+        </button>
       </li>
       {% endfor %}
     </ul>
+
+    <!-- Formulario para Editar Usuario -->
+    <div id="edit-form" style="display: none">
+      <h2>Editar Usuario</h2>
+      <form
+        action="{{ url_for('main.update_kevin', id='') }}"
+        method="POST"
+        id="update-form"
+      >
+        <input type="hidden" name="id" id="edit-id" />
+        <input
+          type="text"
+          name="nombre"
+          id="edit-nombre"
+          placeholder="Nombre"
+          required
+        />
+        <input
+          type="text"
+          name="apellidos"
+          id="edit-apellidos"
+          placeholder="Apellidos"
+          required
+        />
+        <input
+          type="text"
+          name="telefono"
+          id="edit-telefono"
+          placeholder="Teléfono"
+          required
+        />
+        <button type="submit">Actualizar</button>
+      </form>
+    </div>
+
+    <script>
+      document.getElementById("update-form").onsubmit = function (event) {
+        event.preventDefault();
+        var form = event.target;
+        var id = document.getElementById("edit-id").value;
+        form.action = "{{ url_for('main.update_kevin', id='') }}" + id;
+        form.submit();
+      };
+    </script>
   </body>
 </html>

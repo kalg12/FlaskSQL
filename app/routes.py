@@ -45,6 +45,24 @@ def get_kevin():
 # 🔵 API para agregar un nuevo registro
 @main.route("/api/kevin/add", methods=["POST"])
 def add_kevin():
+    # Verifica si los datos vienen en JSON
+    if request.is_json:
+        data = request.get_json()
+    else:
+        data = request.form  # Si no es JSON, revisa si vienen en form-data
+
+    nombre = data.get("nombre")
+    apellidos = data.get("apellidos")
+    telefono = data.get("telefono")
+
+    if not nombre or not apellidos or not telefono:
+        return jsonify({"error": "Todos los campos son obligatorios"}), 400
+
+    new_entry = Kevin(nombre=nombre, apellidos=apellidos, telefono=telefono)
+    db.session.add(new_entry)
+    db.session.commit()
+
+    return jsonify({"message": "Usuario agregado exitosamente", "id": new_entry.id}), 201
     nombre = request.form.get('nombre')
     apellidos = request.form.get('apellidos')
     telefono = request.form.get('telefono')
@@ -68,3 +86,25 @@ def delete_kevin(id):
         return redirect(url_for('main.home'))
 
     return jsonify({"error": "Usuario no encontrado"}), 404
+
+# 🔄 API para actualizar un registro
+@main.route("/api/kevin/update/<string:id>", methods=["POST"])
+def update_kevin(id):
+    entry = Kevin.query.get(id)
+    if not entry:
+        return jsonify({"error": "Usuario no encontrado"}), 404
+
+    nombre = request.form.get('nombre')
+    apellidos = request.form.get('apellidos')
+    telefono = request.form.get('telefono')
+
+    if not nombre or not apellidos or not telefono:
+        return "Error: Todos los campos son obligatorios", 400
+
+    # Actualizar datos
+    entry.nombre = nombre
+    entry.apellidos = apellidos
+    entry.telefono = telefono
+    db.session.commit()
+
+    return redirect(url_for('main.home'))
